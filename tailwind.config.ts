@@ -14,13 +14,11 @@ export default {
     },
     extend: {
       colors: {
-        // Medical Wellness Palette
-        'teal': '#009688',
-        'soft-green': '#8BC34A',
-        'coral': '#FF6F61',
-        'soft-white': '#FAFAFA',
-        'injury-red': '#E53935',
-        'text-gray': '#757575',
+        // Growth Coaching Green Theme
+        'growth-green': '#10B981',
+        'growth-light': '#34D399',
+        'growth-bg': '#F1F5F9',
+        'growth-accent': '#0EA5E9',
         
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
