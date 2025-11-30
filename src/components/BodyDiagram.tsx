@@ -100,7 +100,7 @@ export const BodyDiagram = ({ selectedMuscle, onMuscleSelect }: BodyDiagramProps
   // Create data array for highlighting selected muscles
   const muscleData = selectedMuscles.muscles.map((muscle) => ({
     name: muscle,
-    muscles: [muscle],
+    muscles: [muscle as any],
   }));
 
   const currentViewMuscles = allAvailableMuscles[viewMode];
@@ -144,7 +144,6 @@ export const BodyDiagram = ({ selectedMuscle, onMuscleSelect }: BodyDiagramProps
               minHeight: "500px",
             }}
             highlightedColors={["#10b981"]}
-            colors={["#e5e7eb"]}
             onClick={handleMuscleClick}
             type={viewMode}
           />
@@ -195,14 +194,6 @@ export const BodyDiagram = ({ selectedMuscle, onMuscleSelect }: BodyDiagramProps
               🦵 Knee (Runner's Knee, IT Band)
             </Badge>
           </div>
-        </div>
-
-        <div className="p-4 bg-muted rounded-lg border border-border">
-          <p className="text-sm text-muted-foreground text-center">
-            {selectedMuscle
-              ? `Selected: ${selectedMuscle.charAt(0).toUpperCase() + selectedMuscle.slice(1).replace(/-/g, " ")}`
-              : "Click on any muscle group to get injury insights and recovery tips"}
-          </p>
         </div>
       </div>
     </Card>
