@@ -43,8 +43,8 @@ const Index = () => {
 
             {/* Right Column - Dashboard, Planning, Recommendations & Chat */}
             <div className="flex flex-col gap-4 h-full overflow-hidden">
-              {/* Dashboard - 20% */}
-              <div className="h-[20%] overflow-hidden">
+              {/* Dashboard - 30% */}
+              <div className="h-[30%] overflow-hidden">
                 <Dashboard />
               </div>
 
@@ -53,13 +53,13 @@ const Index = () => {
                 <PlanningTable />
               </div>
 
-              {/* Recommendations Section - 20% */}
-              <div className="h-[20%] overflow-hidden">
+              {/* Recommendations Section - 15% */}
+              <div className="h-[15%] overflow-hidden">
                 <RecommendationPanel selectedMuscle={selectedMuscle} />
               </div>
 
-              {/* Chat Section - 35% */}
-              <div className="h-[35%] overflow-hidden">
+              {/* Chat Section - 30% */}
+              <div className="h-[30%] overflow-hidden">
                 <ChatBox selectedMuscle={selectedMuscle} />
               </div>
             </div>
