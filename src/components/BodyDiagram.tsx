@@ -178,24 +178,6 @@ export const BodyDiagram = ({ selectedMuscle, onMuscleSelect }: BodyDiagramProps
           </p>
         </div>
       )}
-
-      <div className="mt-4 flex-shrink-0 space-y-3">
-        {/* Additional Joint Selections */}
-        <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
-          <h3 className="text-xs font-semibold mb-2 text-amber-900 dark:text-amber-100">
-            Common Injury Areas (Click to select)
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant={selectedMuscle === "knee" ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-              onClick={() => onMuscleSelect("knee")}
-            >
-              🦵 Knee (Runner's Knee, IT Band)
-            </Badge>
-          </div>
-        </div>
-      </div>
     </Card>
   );
 };
