@@ -14,11 +14,12 @@ export default {
     },
     extend: {
       colors: {
-        // Growth Coaching Green Theme
-        'growth-green': '#10B981',
-        'growth-light': '#34D399',
-        'growth-bg': '#F1F5F9',
-        'growth-accent': '#0EA5E9',
+        // Teal + Navy Theme
+        'teal': '#06B6D4',
+        'navy': '#0F172A',
+        'light': '#F8FAFC',
+        'success': '#22C55E',
+        'warning': '#F59E0B',
         
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -48,6 +49,10 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

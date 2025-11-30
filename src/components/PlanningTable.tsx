@@ -18,10 +18,12 @@ const weekPlan: DayPlan[] = [
 
 export const PlanningTable = () => {
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full border-primary/20 shadow-md">
+      <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-transparent">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/80">
+            <Calendar className="w-4 h-4 text-white" />
+          </div>
           Weekly Training Plan
         </CardTitle>
       </CardHeader>
@@ -30,7 +32,7 @@ export const PlanningTable = () => {
           {weekPlan.map((plan, index) => (
             <div
               key={plan.day}
-              className="flex gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+              className="flex gap-3 p-3 rounded-lg border border-border bg-gradient-to-r from-card to-muted/20 hover:shadow-sm transition-all"
             >
               <div className="flex-shrink-0 w-24">
                 <span className="text-sm font-semibold text-primary">

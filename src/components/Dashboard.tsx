@@ -10,8 +10,8 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ title, value, unit, icon, change }: MetricCardProps) => (
-  <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/30 border border-border">
-    <div className="p-3 rounded-lg bg-primary/10">
+  <div className="flex items-center gap-4 p-4 rounded-lg bg-gradient-to-br from-card to-muted/30 border border-border shadow-sm hover:shadow-md transition-shadow">
+    <div className="p-3 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10">
       {icon}
     </div>
     <div className="flex-1">
@@ -21,7 +21,7 @@ const MetricCard = ({ title, value, unit, icon, change }: MetricCardProps) => (
         <span className="text-sm text-muted-foreground">{unit}</span>
       </div>
       {change && (
-        <span className="text-sm text-secondary font-medium">{change}</span>
+        <span className="text-sm text-accent font-medium">{change}</span>
       )}
     </div>
   </div>
@@ -31,10 +31,12 @@ export const Dashboard = () => {
   return (
     <div className="h-full overflow-auto space-y-4">
       {/* Today's Metrics */}
-      <Card>
-        <CardHeader className="pb-4">
+      <Card className="border-primary/20 shadow-lg">
+        <CardHeader className="pb-4 bg-gradient-to-r from-primary/5 to-transparent">
           <CardTitle className="text-xl flex items-center gap-2">
-            <Activity className="w-6 h-6 text-primary" />
+            <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-primary/80">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
             Today's Activity
           </CardTitle>
         </CardHeader>
@@ -73,10 +75,12 @@ export const Dashboard = () => {
       </Card>
 
       {/* Weekly Summary */}
-      <Card>
-        <CardHeader className="pb-4">
+      <Card className="border-accent/20 shadow-lg">
+        <CardHeader className="pb-4 bg-gradient-to-r from-accent/5 to-transparent">
           <CardTitle className="text-xl flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-primary" />
+            <div className="p-2 rounded-lg bg-gradient-to-br from-accent to-accent/80">
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
             This Week's Summary
           </CardTitle>
         </CardHeader>
@@ -86,28 +90,28 @@ export const Dashboard = () => {
               title="Total Distance"
               value="28.5"
               unit="km"
-              icon={<TrendingUp className="w-5 h-5 text-secondary" />}
+              icon={<TrendingUp className="w-5 h-5 text-accent" />}
               change="+15% vs last week"
             />
             <MetricCard
               title="Avg Pace"
               value="5:42"
               unit="min/km"
-              icon={<Zap className="w-5 h-5 text-secondary" />}
+              icon={<Zap className="w-5 h-5 text-accent" />}
               change="Improved by 12s"
             />
             <MetricCard
               title="Total Runs"
               value="4"
               unit="sessions"
-              icon={<Activity className="w-5 h-5 text-secondary" />}
+              icon={<Activity className="w-5 h-5 text-accent" />}
               change="As planned"
             />
             <MetricCard
               title="Calories"
               value="2,340"
               unit="kcal"
-              icon={<Target className="w-5 h-5 text-secondary" />}
+              icon={<Target className="w-5 h-5 text-accent" />}
               change="+8%"
             />
           </div>
@@ -115,10 +119,12 @@ export const Dashboard = () => {
       </Card>
 
       {/* Recent Activities */}
-      <Card>
-        <CardHeader className="pb-4">
+      <Card className="border-navy/20 shadow-lg">
+        <CardHeader className="pb-4 bg-gradient-to-r from-navy/5 to-transparent">
           <CardTitle className="text-xl flex items-center gap-2">
-            <Footprints className="w-6 h-6 text-primary" />
+            <div className="p-2 rounded-lg bg-gradient-to-br from-navy to-navy/80">
+              <Footprints className="w-5 h-5 text-white" />
+            </div>
             Recent Activities
           </CardTitle>
         </CardHeader>
@@ -132,7 +138,7 @@ export const Dashboard = () => {
             ].map((activity, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/30 transition-colors"
+                className="flex items-center justify-between p-4 rounded-lg border border-border bg-gradient-to-r from-card to-muted/20 hover:shadow-md transition-all"
               >
                 <div className="flex-1">
                   <h4 className="font-semibold text-foreground">{activity.type}</h4>
