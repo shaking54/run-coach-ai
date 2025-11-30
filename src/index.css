@@ -4,29 +4,37 @@
 
 @layer base {
   :root {
-    /* Growth Coaching Green Theme */
-    --background: 210 40% 96%; /* #F1F5F9 */
-    --foreground: 222 47% 11%;
+    /* Teal + Navy Theme */
+    --background: 210 40% 98%; /* #F8FAFC */
+    --foreground: 222 47% 11%; /* #0F172A */
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 160 84% 39%; /* #10B981 */
+    --primary: 189 94% 43%; /* #06B6D4 Teal */
     --primary-foreground: 0 0% 100%;
-    --secondary: 158 64% 52%; /* #34D399 */
-    --secondary-foreground: 222 47% 11%;
+    --primary-light: 189 94% 60%; /* Lighter teal for gradients */
+    --secondary: 222 47% 11%; /* #0F172A Navy */
+    --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 199 89% 48%; /* #0EA5E9 */
+    --accent: 142 71% 45%; /* #22C55E Green */
     --accent-foreground: 0 0% 100%;
+    --warning: 38 92% 50%; /* #F59E0B Orange */
+    --warning-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --highlight: 158 64% 52%;
+    --highlight: 189 94% 43%;
     --highlight-foreground: 0 0% 100%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 160 84% 39%;
+    --ring: 189 94% 43%;
     --radius: 0.5rem;
+    
+    /* Gradient variables */
+    --gradient-primary: linear-gradient(135deg, hsl(189, 94%, 43%), hsl(189, 94%, 60%));
+    --gradient-secondary: linear-gradient(135deg, hsl(222, 47%, 11%), hsl(222, 47%, 20%));
+    --gradient-hero: linear-gradient(135deg, hsl(189, 94%, 43%) 0%, hsl(222, 47%, 11%) 100%);
   }
 }
 

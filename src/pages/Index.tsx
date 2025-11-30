@@ -13,14 +13,14 @@ const Index = () => {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="border-b border-border bg-card shadow-sm flex-shrink-0">
+      <header className="border-b border-border bg-gradient-to-r from-card to-background shadow-md flex-shrink-0">
         <div className="px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-lg shadow-md">
+            <div className="p-2 bg-gradient-to-br from-primary via-primary to-navy rounded-lg shadow-lg">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Running AI Coach</h1>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-navy bg-clip-text text-transparent">Running AI Coach</h1>
               <p className="text-xs text-muted-foreground">
                 AI-powered running guidance with <span className="text-primary font-semibold">Google Gemini</span>
               </p>
