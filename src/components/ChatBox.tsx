@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import { Send, AlertCircle } from "lucide-react";
 import { MuscleType, muscleData } from "@/types/muscle";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "./TypingIndicator";
+import { api, userManager } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
@@ -22,7 +24,10 @@ export const ChatBox = ({ selectedMuscle }: ChatBoxProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [isConnected, setIsConnected] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -31,6 +36,30 @@ export const ChatBox = ({ selectedMuscle }: ChatBoxProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Initialize user on mount
+  useEffect(() => {
+    const initUser = async () => {
+      try {
+        const id = await userManager.ensureUser();
+        setUserId(id);
+        
+        // Check backend connection
+        await api.healthCheck();
+        setIsConnected(true);
+      } catch (error) {
+        console.error('Failed to initialize:', error);
+        setIsConnected(false);
+        toast({
+          title: "Connection Error",
+          description: "Could not connect to AI backend. Using fallback mode.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    initUser();
+  }, [toast]);
 
   const generateAIResponse = (userMessage: string): string => {
     const lowerMessage = userMessage.toLowerCase();
@@ -75,7 +104,7 @@ export const ChatBox = ({ selectedMuscle }: ChatBoxProps) => {
   };
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !userId) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -85,20 +114,53 @@ export const ChatBox = ({ selectedMuscle }: ChatBoxProps) => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userInput = input;
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(() => {
+    try {
+      // Add context about selected muscle if any
+      let contextualMessage = userInput;
+      if (selectedMuscle) {
+        const muscle = muscleData[selectedMuscle];
+        contextualMessage = `I have pain in my ${muscle.name}. ${userInput}`;
+      }
+
+      // Call the AI backend
+      const response = await api.chat({
+        user_id: userId,
+        message: contextualMessage,
+      });
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "ai",
-        content: generateAIResponse(input),
+        content: response.response,
         timestamp: new Date(),
       };
+      
       setMessages((prev) => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      
+      // Fallback to local response
+      const fallbackResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        content: generateAIResponse(userInput),
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, fallbackResponse]);
+      
+      toast({
+        title: "Using Fallback Mode",
+        description: "AI backend unavailable. Using local responses.",
+        variant: "default",
+      });
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -109,18 +171,31 @@ export const ChatBox = ({ selectedMuscle }: ChatBoxProps) => {
   };
 
   return (
-    <Card className="flex flex-col h-full bg-card shadow-card">
-      <div className="p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground">AI Running Coach</h3>
-        <p className="text-sm text-muted-foreground">
-          Ask about pain, recovery, or running schedule
-        </p>
+    <Card className="flex flex-col h-full bg-white border-teal/20 shadow-md">
+      <div className="p-4 border-b border-teal/20 bg-gradient-to-r from-teal/5 to-transparent">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+              <span className="w-2 h-2 bg-soft-green rounded-full animate-pulse"></span>
+              AI Running Coach
+            </h3>
+            <p className="text-sm text-text-gray">
+              Ask about pain, recovery, or running schedule
+            </p>
+          </div>
+          {!isConnected && (
+            <div className="flex items-center gap-1 text-xs text-white bg-coral px-2 py-1 rounded-full">
+              <AlertCircle className="w-3 h-3" />
+              <span>Offline</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-soft-white">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground text-center max-w-sm">
+            <p className="text-text-gray text-center max-w-sm">
               Start a conversation by asking about your injury, recovery tips, or whether you should
               run tomorrow.
             </p>
@@ -135,19 +210,19 @@ export const ChatBox = ({ selectedMuscle }: ChatBoxProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-teal/20 bg-white">
         <div className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask about pain, recovery, or running schedule..."
-            className="flex-1"
+            className="flex-1 bg-soft-white border-gray-300 text-gray-800 placeholder:text-text-gray focus:border-teal focus:ring-teal"
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
-            className="bg-primary hover:bg-primary-hover"
+            className="bg-gradient-to-r from-teal to-teal/90 hover:from-teal/90 hover:to-teal/80 text-white shadow-md"
             size="icon"
           >
             <Send className="w-4 h-4" />

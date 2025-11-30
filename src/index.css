@@ -2,113 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 210 30% 98%;
-    --foreground: 215 25% 15%;
-
+    /* Medical Wellness Palette - Light Mode */
+    --background: 0 0% 98%; /* Soft White #FAFAFA */
+    --foreground: 0 0% 20%;
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
-
+    --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
-
-    /* Medical blue - trust and professionalism */
-    --primary: 200 85% 45%;
+    --popover-foreground: 0 0% 20%;
+    --primary: 174 100% 29%; /* Teal #009688 */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 200 85% 40%;
-    
-    /* Recovery green - health and vitality */
-    --accent: 145 65% 50%;
-    --accent-foreground: 0 0% 100%;
-    --accent-hover: 145 65% 45%;
-
-    --secondary: 210 25% 95%;
-    --secondary-foreground: 215 25% 25%;
-
-    --muted: 210 20% 92%;
-    --muted-foreground: 215 15% 45%;
-
-    --destructive: 0 75% 55%;
+    --secondary: 88 50% 53%; /* Soft Green #8BC34A */
+    --secondary-foreground: 0 0% 20%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 88 50% 53%; /* Soft Green #8BC34A */
+    --accent-foreground: 0 0% 20%;
+    --destructive: 4 79% 56%; /* Red */
     --destructive-foreground: 0 0% 100%;
-
-    --border: 215 20% 88%;
-    --input: 215 20% 88%;
-    --ring: 200 85% 45%;
-
-    --radius: 0.75rem;
-
-    /* Muscle selection colors */
-    --muscle-hover: 200 85% 45%;
-    --muscle-selected: 145 65% 50%;
-    --muscle-inactive: 215 15% 75%;
-
-    /* Chat colors */
-    --chat-user-bg: 200 85% 45%;
-    --chat-ai-bg: 210 25% 95%;
-    --chat-user-text: 0 0% 100%;
-    --chat-ai-text: 215 25% 15%;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(200, 85%, 45%), hsl(200, 85%, 55%));
-    --gradient-accent: linear-gradient(135deg, hsl(145, 65%, 50%), hsl(145, 65%, 60%));
-    
-    /* Shadows */
-    --shadow-card: 0 2px 8px hsla(215, 25%, 15%, 0.08);
-    --shadow-hover: 0 4px 16px hsla(215, 25%, 15%, 0.12);
-    --shadow-muscle: 0 0 0 3px hsla(200, 85%, 45%, 0.3);
-
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .dark {
-    --background: 215 30% 10%;
-    --foreground: 210 20% 95%;
-
-    --card: 215 25% 12%;
-    --card-foreground: 210 20% 95%;
-
-    --popover: 215 25% 12%;
-    --popover-foreground: 210 20% 95%;
-
-    --primary: 200 85% 55%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 200 85% 60%;
-
-    --accent: 145 65% 55%;
-    --accent-foreground: 0 0% 100%;
-    --accent-hover: 145 65% 60%;
-
-    --secondary: 215 25% 18%;
-    --secondary-foreground: 210 20% 90%;
-
-    --muted: 215 25% 16%;
-    --muted-foreground: 215 15% 60%;
-
-    --destructive: 0 75% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 215 25% 20%;
-    --input: 215 25% 20%;
-    --ring: 200 85% 55%;
-
-    --muscle-hover: 200 85% 55%;
-    --muscle-selected: 145 65% 55%;
-    --muscle-inactive: 215 15% 40%;
-
-    --chat-user-bg: 200 85% 45%;
-    --chat-ai-bg: 215 25% 18%;
-    --chat-user-text: 0 0% 100%;
-    --chat-ai-text: 210 20% 95%;
-
-    --shadow-card: 0 2px 8px hsla(0, 0%, 0%, 0.3);
-    --shadow-hover: 0 4px 16px hsla(0, 0%, 0%, 0.4);
-    --shadow-muscle: 0 0 0 3px hsla(200, 85%, 55%, 0.4);
+    --highlight: 6 100% 69%; /* Coral #FF6F61 */
+    --highlight-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 174 100% 29%;
+    --radius: 0.5rem;
   }
 }
 
@@ -116,8 +34,13 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
+  
   body {
-    @apply bg-background text-foreground;
+    @apply bg-soft-white text-foreground;
+  }
+  
+  /* Light mode */
+  :root {
+    color-scheme: light;
   }
 }

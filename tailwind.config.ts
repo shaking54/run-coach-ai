@@ -14,6 +14,14 @@ export default {
     },
     extend: {
       colors: {
+        // Medical Wellness Palette
+        'teal': '#009688',
+        'soft-green': '#8BC34A',
+        'coral': '#FF6F61',
+        'soft-white': '#FAFAFA',
+        'injury-red': '#E53935',
+        'text-gray': '#757575',
+        
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -22,7 +30,6 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          hover: "hsl(var(--primary-hover))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -32,6 +39,10 @@ export default {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        highlight: {
+          DEFAULT: "hsl(var(--highlight))",
+          foreground: "hsl(var(--highlight-foreground))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -39,7 +50,6 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
-          hover: "hsl(var(--accent-hover))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -48,17 +58,6 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
-        muscle: {
-          hover: "hsl(var(--muscle-hover))",
-          selected: "hsl(var(--muscle-selected))",
-          inactive: "hsl(var(--muscle-inactive))",
-        },
-        chat: {
-          userBg: "hsl(var(--chat-user-bg))",
-          aiBg: "hsl(var(--chat-ai-bg))",
-          userText: "hsl(var(--chat-user-text))",
-          aiText: "hsl(var(--chat-ai-text))",
         },
       },
       borderRadius: {
@@ -83,44 +82,10 @@ export default {
             height: "0",
           },
         },
-        "pulse-glow": {
-          "0%, 100%": {
-            opacity: "1",
-          },
-          "50%": {
-            opacity: "0.6",
-          },
-        },
-        "slide-up": {
-          "0%": {
-            transform: "translateY(10px)",
-            opacity: "0",
-          },
-          "100%": {
-            transform: "translateY(0)",
-            opacity: "1",
-          },
-        },
-        "typing": {
-          "0%, 100%": {
-            opacity: "0.3",
-          },
-          "50%": {
-            opacity: "1",
-          },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "slide-up": "slide-up 0.3s ease-out",
-        "typing": "typing 1.4s ease-in-out infinite",
-      },
-      boxShadow: {
-        card: "var(--shadow-card)",
-        hover: "var(--shadow-hover)",
-        muscle: "var(--shadow-muscle)",
       },
     },
   },

@@ -1,197 +1,209 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { MuscleType } from "@/types/muscle";
-import { FlipHorizontal } from "lucide-react";
-import bodyAnatomyFront from "@/assets/body-anatomy-front.png";
+import { FlipHorizontal, Info } from "lucide-react";
+import Model from "react-body-highlighter";
 
 interface BodyDiagramProps {
   selectedMuscle: MuscleType | null;
   onMuscleSelect: (muscle: MuscleType) => void;
 }
 
-type ViewMode = "front" | "back";
+type ViewMode = "anterior" | "posterior";
 
-// Define clickable regions as percentage coordinates on the image
-interface MuscleRegion {
-  id: MuscleType;
-  name: string;
-  // SVG path for clickable area
-  path: string;
-  labelPosition: { x: string; y: string };
-}
+// Map react-body-highlighter muscle names to our muscle types
+const muscleMapping: Record<string, MuscleType> = {
+  "quadriceps": "quadriceps",
+  "hamstring": "hamstrings",
+  "gluteal": "glutes",
+  "calves": "calves",
+  "adductor": "adductors",
+  "lower-back": "lower-back",
+  "obliques": "core",
+  "abs": "core",
+  "trapezius": "trapezius",
+  "upper-back": "upper-back",
+  "chest": "chest",
+  "biceps": "biceps",
+  "triceps": "triceps",
+  "forearm": "forearm",
+  "front-deltoids": "deltoids",
+  "back-deltoids": "deltoids",
+  "abductors": "abductors",
+  "neck": "neck",
+  "head": "neck", // Map head clicks to neck
+};
+
+// All available muscles in the library (for debugging/display)
+const allAvailableMuscles = {
+  anterior: [
+    "trapezius", "chest", "biceps", "triceps", "forearm", 
+    "front-deltoids", "abs", "obliques", "adductor", 
+    "quadriceps", "abductors", "calves", "head", "neck"
+  ],
+  posterior: [
+    "trapezius", "upper-back", "lower-back", "biceps", "triceps",
+    "forearm", "back-deltoids", "gluteal", "hamstring", 
+    "calves", "head", "neck"
+  ]
+};
+
+// Reverse mapping: our muscle types to library muscle names
+const getMusclesForType = (muscleType: MuscleType | null): { name: string; muscles: string[] } => {
+  if (!muscleType) return { name: "", muscles: [] };
+
+  const mappings: Record<MuscleType, string[]> = {
+    "quadriceps": ["quadriceps"],
+    "hamstrings": ["hamstring"],
+    "glutes": ["gluteal"],
+    "calves": ["calves"],
+    "hip-flexors": ["adductor"], // Map hip-flexors to adductor area
+    "adductors": ["adductor"],
+    "lower-back": ["lower-back"],
+    "core": ["obliques", "abs"],
+    "trapezius": ["trapezius"],
+    "upper-back": ["upper-back"],
+    "chest": ["chest"],
+    "biceps": ["biceps"],
+    "triceps": ["triceps"],
+    "forearm": ["forearm"],
+    "deltoids": ["front-deltoids", "back-deltoids"],
+    "abductors": ["abductors"],
+    "neck": ["neck", "head"],
+    "knee": ["quadriceps"], // Knee area overlaps with quads visually
+  };
+
+  return {
+    name: muscleType,
+    muscles: mappings[muscleType] || [],
+  };
+};
 
 export const BodyDiagram = ({ selectedMuscle, onMuscleSelect }: BodyDiagramProps) => {
-  const [viewMode, setViewMode] = useState<ViewMode>("front");
-  const [hoveredMuscle, setHoveredMuscle] = useState<MuscleType | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("anterior");
+  const [showAllMuscles, setShowAllMuscles] = useState(false);
 
-  // Define clickable regions for front view (based on anatomical positions in the image)
-  const frontMuscles: MuscleRegion[] = [
-    {
-      id: "quadriceps",
-      name: "Quadriceps",
-      path: "M 45 62 L 55 62 L 56 75 L 44 75 Z", // Front thigh area
-      labelPosition: { x: "50", y: "68" },
-    },
-    {
-      id: "hip-flexors",
-      name: "Hip Flexors",
-      path: "M 44 55 L 56 55 L 56 62 L 44 62 Z", // Hip/groin area
-      labelPosition: { x: "50", y: "58" },
-    },
-    {
-      id: "adductors",
-      name: "Adductors",
-      path: "M 42 62 L 44 62 L 44 74 L 42 72 Z M 56 62 L 58 62 L 58 72 L 56 74 Z", // Inner thighs
-      labelPosition: { x: "40", y: "68" },
-    },
-    {
-      id: "core",
-      name: "Core",
-      path: "M 42 42 L 58 42 L 58 54 L 42 54 Z", // Abdominal area
-      labelPosition: { x: "50", y: "48" },
-    },
-    {
-      id: "calves",
-      name: "Calves",
-      path: "M 44 76 L 48 76 L 48 88 L 44 87 Z M 52 76 L 56 76 L 56 87 L 52 88 Z", // Lower legs
-      labelPosition: { x: "50", y: "82" },
-    },
-  ];
+  const handleMuscleClick = (muscleData: { muscle: string; label?: string }) => {
+    console.log("Clicked muscle:", muscleData.muscle); // Debug log
+    const mappedMuscle = muscleMapping[muscleData.muscle];
+    if (mappedMuscle) {
+      onMuscleSelect(mappedMuscle);
+    } else {
+      console.log("Muscle not mapped to app muscle type:", muscleData.muscle);
+    }
+  };
 
-  // Define clickable regions for back view
-  const backMuscles: MuscleRegion[] = [
-    {
-      id: "hamstrings",
-      name: "Hamstrings",
-      path: "M 44 62 L 56 62 L 56 76 L 44 76 Z", // Back thigh area
-      labelPosition: { x: "50", y: "68" },
-    },
-    {
-      id: "glutes",
-      name: "Glutes",
-      path: "M 42 54 L 58 54 L 58 62 L 42 62 Z", // Buttocks area
-      labelPosition: { x: "50", y: "58" },
-    },
-    {
-      id: "lower-back",
-      name: "Lower Back",
-      path: "M 44 44 L 56 44 L 56 54 L 44 54 Z", // Lower back area
-      labelPosition: { x: "50", y: "49" },
-    },
-    {
-      id: "calves",
-      name: "Calves",
-      path: "M 44 76 L 48 76 L 48 88 L 44 87 Z M 52 76 L 56 76 L 56 87 L 52 88 Z", // Lower legs
-      labelPosition: { x: "50", y: "82" },
-    },
-  ];
+  const selectedMuscles = getMusclesForType(selectedMuscle);
 
-  const muscles = viewMode === "front" ? frontMuscles : backMuscles;
+  // Create data array for highlighting selected muscles
+  const muscleData = selectedMuscles.muscles.map((muscle) => ({
+    name: muscle,
+    muscles: [muscle],
+  }));
+
+  const currentViewMuscles = allAvailableMuscles[viewMode];
+  const runningMuscles = viewMode === "anterior" 
+    ? ["quadriceps", "calves", "adductor", "abs", "obliques", "chest", "front-deltoids", "trapezius", "biceps", "triceps", "forearm", "neck"]
+    : ["hamstring", "gluteal", "calves", "lower-back", "upper-back", "trapezius", "back-deltoids", "biceps", "triceps", "forearm", "neck"];
 
   return (
-    <Card className="h-full p-6 flex flex-col bg-card shadow-card">
-      <div className="flex items-center justify-between mb-6">
+    <Card className="h-full p-6 flex flex-col bg-card shadow-card overflow-auto">
+      <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <h2 className="text-2xl font-bold text-foreground">Select Muscle</h2>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setViewMode(viewMode === "front" ? "back" : "front")}
-          className="gap-2"
-        >
-          <FlipHorizontal className="w-4 h-4" />
-          {viewMode === "front" ? "View Back" : "View Front"}
-        </Button>
-      </div>
-
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden">
-        <div className="relative w-full max-w-[400px] h-full flex items-center justify-center">
-          {/* Anatomical Body Image */}
-          {viewMode === "front" ? (
-            <img
-              src={bodyAnatomyFront}
-              alt="Human body anatomy front view"
-              className="w-full h-auto max-h-[600px] object-contain"
-            />
-          ) : (
-            // For back view, we'll use a simple outline (can add separate back image later)
-            <div className="relative w-full h-auto max-h-[600px] flex items-center justify-center bg-muted/20 rounded-lg">
-              <svg viewBox="0 0 200 400" className="w-full h-auto opacity-20" fill="currentColor">
-                <ellipse cx="100" cy="40" rx="30" ry="35" />
-                <rect x="60" y="75" width="80" height="120" rx="10" />
-                <rect x="30" y="80" width="25" height="100" rx="8" />
-                <rect x="145" y="80" width="25" height="100" rx="8" />
-                <rect x="70" y="195" width="25" height="150" rx="8" />
-                <rect x="105" y="195" width="25" height="150" rx="8" />
-              </svg>
-            </div>
-          )}
-
-          {/* Interactive SVG Overlay */}
-          <svg
-            viewBox="0 0 100 100"
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{ maxHeight: "600px" }}
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAllMuscles(!showAllMuscles)}
+            className="gap-2"
           >
-            {muscles.map((muscle) => (
-              <g key={muscle.id}>
-                {/* Clickable region */}
-                <path
-                  d={muscle.path}
-                  className={`
-                    pointer-events-auto cursor-pointer transition-all duration-300
-                    ${
-                      selectedMuscle === muscle.id
-                        ? "fill-muscle-selected opacity-40 stroke-muscle-selected stroke-2"
-                        : hoveredMuscle === muscle.id
-                        ? "fill-muscle-hover opacity-30 stroke-muscle-hover stroke-2"
-                        : "fill-transparent hover:fill-muscle-hover hover:opacity-20 stroke-transparent hover:stroke-muscle-hover hover:stroke-1"
-                    }
-                  `}
-                  onClick={() => onMuscleSelect(muscle.id)}
-                  onMouseEnter={() => setHoveredMuscle(muscle.id)}
-                  onMouseLeave={() => setHoveredMuscle(null)}
-                />
-
-                {/* Label badge */}
-                {(hoveredMuscle === muscle.id || selectedMuscle === muscle.id) && (
-                  <g className="pointer-events-none">
-                    <rect
-                      x={parseFloat(muscle.labelPosition.x) - 8}
-                      y={parseFloat(muscle.labelPosition.y) - 2}
-                      width="16"
-                      height="4"
-                      rx="2"
-                      className={`
-                        ${
-                          selectedMuscle === muscle.id
-                            ? "fill-muscle-selected"
-                            : "fill-muscle-hover"
-                        }
-                      `}
-                    />
-                    <text
-                      x={muscle.labelPosition.x}
-                      y={parseFloat(muscle.labelPosition.y) + 1.5}
-                      textAnchor="middle"
-                      className="fill-white text-[2.5px] font-semibold"
-                    >
-                      {muscle.name}
-                    </text>
-                  </g>
-                )}
-              </g>
-            ))}
-          </svg>
+            <Info className="w-4 h-4" />
+            {showAllMuscles ? "Hide" : "Show"} All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewMode(viewMode === "anterior" ? "posterior" : "anterior")}
+            className="gap-2"
+          >
+            <FlipHorizontal className="w-4 h-4" />
+            {viewMode === "anterior" ? "View Back" : "View Front"}
+          </Button>
         </div>
       </div>
 
-      <div className="mt-6 p-4 bg-muted rounded-lg border border-border">
-        <p className="text-sm text-muted-foreground text-center">
-          {viewMode === "front"
-            ? "Hover over or click on muscle groups in the anatomy diagram"
-            : "Viewing back muscles - click on highlighted areas for details"}
-        </p>
+      <div className="flex-1 relative flex items-center justify-center overflow-auto">
+        <div className="relative w-full h-full flex items-center justify-center py-4">
+          <Model
+            data={muscleData}
+            style={{
+              width: "100%",
+              height: "100%",
+              minHeight: "500px",
+            }}
+            highlightedColors={["#10b981"]}
+            colors={["#e5e7eb"]}
+            onClick={handleMuscleClick}
+            type={viewMode}
+          />
+        </div>
+      </div>
+
+      {showAllMuscles && (
+        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800 flex-shrink-0">
+          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+            <Info className="w-4 h-4" />
+            Available Muscles ({viewMode === "anterior" ? "Front" : "Back"} View)
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {currentViewMuscles.map((muscle) => {
+              const isRunningMuscle = runningMuscles.includes(muscle);
+              const isMapped = muscleMapping[muscle];
+              return (
+                <Badge
+                  key={muscle}
+                  variant={isMapped ? "default" : "outline"}
+                  className={`text-xs ${isRunningMuscle ? "bg-green-600" : ""}`}
+                >
+                  {muscle}
+                  {isMapped && " ✓"}
+                </Badge>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            <span className="text-green-600 font-semibold">Green = Running-relevant</span> | 
+            <span className="ml-2">✓ = Mapped to app data</span>
+          </p>
+        </div>
+      )}
+
+      <div className="mt-4 flex-shrink-0 space-y-3">
+        {/* Additional Joint Selections */}
+        <div className="p-3 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-800">
+          <h3 className="text-xs font-semibold mb-2 text-amber-900 dark:text-amber-100">
+            Common Injury Areas (Click to select)
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            <Badge
+              variant={selectedMuscle === "knee" ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+              onClick={() => onMuscleSelect("knee")}
+            >
+              🦵 Knee (Runner's Knee, IT Band)
+            </Badge>
+          </div>
+        </div>
+
+        <div className="p-4 bg-muted rounded-lg border border-border">
+          <p className="text-sm text-muted-foreground text-center">
+            {selectedMuscle
+              ? `Selected: ${selectedMuscle.charAt(0).toUpperCase() + selectedMuscle.slice(1).replace(/-/g, " ")}`
+              : "Click on any muscle group to get injury insights and recovery tips"}
+          </p>
+        </div>
       </div>
     </Card>
   );
