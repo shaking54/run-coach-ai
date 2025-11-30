@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { BodyDiagram } from "@/components/BodyDiagram";
-import { RecommendationPanel } from "@/components/RecommendationPanel";
 import { ChatBox } from "@/components/ChatBox";
 import { Dashboard } from "@/components/Dashboard";
 import { PlanningTable } from "@/components/PlanningTable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MuscleType } from "@/types/muscle";
-import { Activity } from "lucide-react";
+import { Activity, TrendingUp } from "lucide-react";
 
 const Index = () => {
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleType | null>(null);
@@ -31,40 +31,51 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
-        <div className="h-full px-4 py-4">
-          <div className="grid lg:grid-cols-[35%_65%] gap-4 h-full">
-            {/* Left Column - Body Diagram */}
-            <div className="h-full overflow-hidden">
-              <BodyDiagram 
-                selectedMuscle={selectedMuscle} 
-                onMuscleSelect={setSelectedMuscle} 
-              />
+        <Tabs defaultValue="coach" className="h-full flex flex-col">
+          <TabsList className="mx-4 mt-4 w-fit">
+            <TabsTrigger value="coach" className="gap-2">
+              <Activity className="w-4 h-4" />
+              Coach
+            </TabsTrigger>
+            <TabsTrigger value="activities" className="gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Activities Dashboard
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Coach Tab */}
+          <TabsContent value="coach" className="flex-1 overflow-hidden px-4 pb-4 mt-4">
+            <div className="grid lg:grid-cols-[35%_65%] gap-4 h-full">
+              {/* Left Column - Body Diagram */}
+              <div className="h-full overflow-hidden">
+                <BodyDiagram 
+                  selectedMuscle={selectedMuscle} 
+                  onMuscleSelect={setSelectedMuscle} 
+                />
+              </div>
+
+              {/* Right Column - Planning & Chat */}
+              <div className="flex flex-col gap-4 h-full overflow-hidden">
+                {/* Planning Table - 40% */}
+                <div className="h-[40%] overflow-auto">
+                  <PlanningTable />
+                </div>
+
+                {/* Chat Section - 60% */}
+                <div className="h-[60%] overflow-hidden">
+                  <ChatBox selectedMuscle={selectedMuscle} />
+                </div>
+              </div>
             </div>
+          </TabsContent>
 
-            {/* Right Column - Dashboard, Planning, Recommendations & Chat */}
-            <div className="flex flex-col gap-4 h-full overflow-hidden">
-              {/* Dashboard - 30% */}
-              <div className="h-[30%] overflow-hidden">
-                <Dashboard />
-              </div>
-
-              {/* Planning Table - 25% */}
-              <div className="h-[25%] overflow-auto">
-                <PlanningTable />
-              </div>
-
-              {/* Recommendations Section - 15% */}
-              <div className="h-[15%] overflow-hidden">
-                <RecommendationPanel selectedMuscle={selectedMuscle} />
-              </div>
-
-              {/* Chat Section - 30% */}
-              <div className="h-[30%] overflow-hidden">
-                <ChatBox selectedMuscle={selectedMuscle} />
-              </div>
+          {/* Activities Dashboard Tab */}
+          <TabsContent value="activities" className="flex-1 overflow-hidden px-4 pb-4 mt-4">
+            <div className="h-full">
+              <Dashboard />
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
