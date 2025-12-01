@@ -1,5 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Heart, Footprints, Clock, Zap, TrendingUp, Calendar, Target } from "lucide-react";
+import { Activity, Heart, Footprints, Clock, TrendingUp, Calendar, Target, Watch } from "lucide-react";
+import { api } from "@/lib/api";
 
 interface MetricCardProps {
   title: string;
@@ -28,6 +30,33 @@ const MetricCard = ({ title, value, unit, icon, change }: MetricCardProps) => (
 );
 
 export const Dashboard = () => {
+  const { data: activities } = useQuery({
+    queryKey: ["activities"],
+    queryFn: () => api.getActivities(5),
+  });
+
+  const { data: dailyMetrics } = useQuery({
+    queryKey: ["dailyMetrics"],
+    queryFn: () => api.getDailyMetrics(1),
+  });
+
+  const latestMetric = dailyMetrics?.[0];
+  const steps = latestMetric?.steps?.toLocaleString() || "0";
+  const restingHR = latestMetric?.resting_heart_rate || "--";
+  const sleepScore = latestMetric?.sleep_score || "--";
+
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatDistance = (meters?: number) => {
+    if (!meters) return "0.0";
+    return (meters / 1000).toFixed(2);
+  };
+
   return (
     <div className="h-full overflow-auto space-y-4">
       {/* Today's Metrics */}
@@ -35,84 +64,36 @@ export const Dashboard = () => {
         <CardHeader className="pb-4 bg-gradient-to-r from-primary/5 to-transparent">
           <CardTitle className="text-xl flex items-center gap-2">
             <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-primary/80">
-              <Activity className="w-5 h-5 text-white" />
+              <Watch className="w-5 h-5 text-white" />
             </div>
-            Today's Activity
+            Today's Stats (Synced)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard
-              title="Heart Rate"
-              value="72"
+              title="Resting HR"
+              value={restingHR.toString()}
               unit="bpm"
               icon={<Heart className="w-5 h-5 text-primary" />}
-              change="+2 from avg"
             />
             <MetricCard
               title="Steps Today"
-              value="8,547"
+              value={steps}
               unit="steps"
               icon={<Footprints className="w-5 h-5 text-primary" />}
-              change="+12% vs yesterday"
             />
             <MetricCard
-              title="Active Time"
-              value="42"
-              unit="min"
+              title="Sleep Score"
+              value={sleepScore.toString()}
+              unit="/100"
               icon={<Clock className="w-5 h-5 text-primary" />}
-              change="On track"
             />
             <MetricCard
               title="Distance"
-              value="6.2"
+              value={formatDistance(latestMetric?.steps ? latestMetric.steps * 0.76 : 0)} // Rough estimate if distance not synced
               unit="km"
               icon={<Activity className="w-5 h-5 text-primary" />}
-              change="+0.8 km"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Weekly Summary */}
-      <Card className="border-accent/20 shadow-lg">
-        <CardHeader className="pb-4 bg-gradient-to-r from-accent/5 to-transparent">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-accent to-accent/80">
-              <Calendar className="w-5 h-5 text-white" />
-            </div>
-            This Week's Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard
-              title="Total Distance"
-              value="28.5"
-              unit="km"
-              icon={<TrendingUp className="w-5 h-5 text-accent" />}
-              change="+15% vs last week"
-            />
-            <MetricCard
-              title="Avg Pace"
-              value="5:42"
-              unit="min/km"
-              icon={<Zap className="w-5 h-5 text-accent" />}
-              change="Improved by 12s"
-            />
-            <MetricCard
-              title="Total Runs"
-              value="4"
-              unit="sessions"
-              icon={<Activity className="w-5 h-5 text-accent" />}
-              change="As planned"
-            />
-            <MetricCard
-              title="Calories"
-              value="2,340"
-              unit="kcal"
-              icon={<Target className="w-5 h-5 text-accent" />}
-              change="+8%"
             />
           </div>
         </CardContent>
@@ -125,41 +106,45 @@ export const Dashboard = () => {
             <div className="p-2 rounded-lg bg-gradient-to-br from-navy to-navy/80">
               <Footprints className="w-5 h-5 text-white" />
             </div>
-            Recent Activities
+            Recent Activities (Garmin)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[
-              { date: "Today, 7:30 AM", type: "Morning Run", distance: "6.2 km", duration: "35:24", pace: "5:42" },
-              { date: "Yesterday, 6:45 AM", type: "Interval Training", distance: "5.0 km", duration: "28:30", pace: "5:42" },
-              { date: "2 days ago, 7:00 AM", type: "Easy Run", distance: "8.0 km", duration: "48:00", pace: "6:00" },
-              { date: "3 days ago, 6:30 AM", type: "Recovery Run", distance: "4.0 km", duration: "26:00", pace: "6:30" },
-            ].map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 rounded-lg border border-border bg-gradient-to-r from-card to-muted/20 hover:shadow-md transition-all"
-              >
-                <div className="flex-1">
-                  <h4 className="font-semibold text-foreground">{activity.type}</h4>
-                  <p className="text-sm text-muted-foreground">{activity.date}</p>
+            {activities?.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">No activities synced yet.</p>
+            ) : (
+              activities?.map((activity, index) => (
+                <div
+                  key={activity.id}
+                  className="flex items-center justify-between p-4 rounded-lg border border-border bg-gradient-to-r from-card to-muted/20 hover:shadow-md transition-all"
+                >
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground">{activity.activity_name || activity.activity_type}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(activity.start_time).toLocaleString()}
+                    </p>
+                    <span className="text-xs bg-secondary px-2 py-1 rounded-full mt-1 inline-block">
+                      {activity.source}
+                    </span>
+                  </div>
+                  <div className="flex gap-6 text-sm">
+                    <div className="text-center">
+                      <p className="text-muted-foreground">Distance</p>
+                      <p className="font-semibold text-foreground">{formatDistance(activity.distance_meters)} km</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-muted-foreground">Duration</p>
+                      <p className="font-semibold text-foreground">{formatDuration(activity.duration_seconds)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-muted-foreground">Calories</p>
+                      <p className="font-semibold text-foreground">{activity.calories || "--"}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex gap-6 text-sm">
-                  <div className="text-center">
-                    <p className="text-muted-foreground">Distance</p>
-                    <p className="font-semibold text-foreground">{activity.distance}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-muted-foreground">Duration</p>
-                    <p className="font-semibold text-foreground">{activity.duration}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-muted-foreground">Pace</p>
-                    <p className="font-semibold text-foreground">{activity.pace}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>

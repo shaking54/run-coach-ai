@@ -51,6 +51,24 @@ export interface HealthCheck {
   ai_model: string;
 }
 
+export interface Activity {
+  id: number;
+  source: string;
+  activity_type?: string;
+  activity_name?: string;
+  start_time: string;
+  distance_meters?: number;
+  duration_seconds?: number;
+  calories?: number;
+}
+
+export interface DailyMetric {
+  date: string;
+  steps?: number;
+  resting_heart_rate?: number;
+  sleep_score?: number;
+}
+
 // ============================================================================
 // API Service Class
 // ============================================================================
@@ -142,6 +160,18 @@ class APIService {
 
   async getConversations(userId: number): Promise<Conversation[]> {
     return this.request<Conversation[]>(`/conversations/${userId}`);
+  }
+
+  // ============================================================================
+  // Activities (Data Warehouse)
+  // ============================================================================
+
+  async getActivities(limit: number = 10): Promise<Activity[]> {
+    return this.request<Activity[]>(`/activities?limit=${limit}`);
+  }
+
+  async getDailyMetrics(limit: number = 7): Promise<DailyMetric[]> {
+    return this.request<DailyMetric[]>(`/activities/metrics/daily?limit=${limit}`);
   }
 
   // ============================================================================
